@@ -3,6 +3,7 @@ import { TMatrix } from "./meetingMatrix";
 export type User = {
   id: number;
   name: string;
+  weight: number;
 };
 export type TPair = [User, User];
 
@@ -10,9 +11,10 @@ export function getUsers(names: string): User[] {
   if (!names) {
     return [];
   }
-  return names.split("\n").map<User>((name, i) => ({
+  return names.split("\n").map<User>((nameAndWeight, i) => ({
     id: i,
-    name
+    name: nameAndWeight.split("\t")[0],
+    weight: parseInt(nameAndWeight.split("\t")[1] ?? 1),
   }));
 }
 
@@ -55,6 +57,7 @@ type FirstMetingsByRoundProps = {
 export type UserFirstMeetings = {
   name: string;
   id: number;
+  weight: number;
   firstMetByRound: number[];
 };
 
@@ -68,7 +71,8 @@ export function getUserFirstMeetings(
       acc[user.id] = {
         name: user.name,
         id: user.id,
-        firstMetByRound: Array(numRounds).fill(0)
+        weight: user.weight,
+        firstMetByRound: Array(numRounds).fill(0),
       };
       return acc;
     },
@@ -77,9 +81,11 @@ export function getUserFirstMeetings(
 
   firstMetPairs.forEach((round, roundNumber) => {
     round.forEach((pair) => {
-      const [first, second] = pair;
-      firstMeetingsByUser[first.id].firstMetByRound[roundNumber] += 1;
-      firstMeetingsByUser[second.id].firstMetByRound[roundNumber] += 1;
+      const [user1, user2] = pair;
+      const user1Weight = firstMeetingsByUser[user1.id].weight;
+      const user2Weight = firstMeetingsByUser[user2.id].weight;
+      firstMeetingsByUser[user1.id].firstMetByRound[roundNumber] += user2Weight;
+      firstMeetingsByUser[user2.id].firstMetByRound[roundNumber] += user1Weight;
     });
   });
 
@@ -101,8 +107,8 @@ export function getNeverMetByUser(users: User[], matrix: TMatrix) {
         timesMet = matrix[users[j].id][users[i].id];
       }
       if (timesMet === 0) {
-        neverMetByUser[users[i].id] += 1;
-        neverMetByUser[users[j].id] += 1;
+        neverMetByUser[users[i].id] += users[j].weight;
+        neverMetByUser[users[j].id] += users[i].weight;
       }
     }
   }

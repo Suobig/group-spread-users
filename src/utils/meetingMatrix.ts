@@ -62,9 +62,11 @@ export function getQualityDiff(groups: User[][], matrix: TMatrix): number {
   let qualityAfter = 0;
 
   pairs.forEach((pair) => {
+    const [user1, user2] = pair;
+    const weights = user1.weight + user2.weight;
     const timesMet = getTimesMet(pair, matrix);
-    qualityBefore += getPairQuality(timesMet);
-    qualityAfter += getPairQuality(timesMet + 1);
+    qualityBefore += getPairQuality(timesMet) * weights;
+    qualityAfter += getPairQuality(timesMet + 1) * weights;
   }, 0);
 
   return qualityAfter - qualityBefore;

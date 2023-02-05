@@ -16,7 +16,6 @@ import {
   getNeverMetByUser,
   getUserFirstMeetings,
   getUsers,
-  TPair,
   User,
   UserFirstMeetings,
 } from "./utils/users";
@@ -57,6 +56,8 @@ export default function App() {
       setFormState(e);
 
       const users = getUsers(userNames);
+
+      console.log("users", users);
       const numGroups = rawNumGroups ? parseInt(rawNumGroups, 10) : 0;
       const numRounds = rawNumRounds ? parseInt(rawNumRounds, 10) : 0;
 
